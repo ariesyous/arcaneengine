@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Arcane Engine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- TOP: The Target -->
+        <header id="target-area">
+            <div class="boss-card">
+                <div class="boss-name" id="boss-name">The Hierophant</div>
+                <div class="boss-stats">
+                    <div class="boss-hp">HP: <span id="boss-hp-val">100</span>/<span id="boss-hp-max">100</span></div>
+                    <div class="doom-clock">Doom Clock: <span id="doom-clock-val">10</span></div>
+                </div>
+                <div class="boss-image-placeholder"></div>
+            </div>
+            <div class="boss-intent" id="boss-intent">
+                Next Attack: <span id="boss-attack-val">15</span> DMG
+            </div>
+        </header>
+
+        <!-- MIDDLE: The Leyline -->
+        <section id="leyline-area">
+            <div class="engine-controls">
+                <button id="btn-run-engine" class="primary-btn">Run Engine</button>
+                <div class="player-stats">
+                    <div class="stat hp">HP: <span id="player-hp-val">50</span></div>
+                    <div class="stat shields">Shields: <span id="player-shields-val">0</span></div>
+                    <div class="stat gold">Gold: <span id="player-gold-val">25</span></div>
+                </div>
+            </div>
+            <div class="leyline-slots" id="leyline-slots">
+                <!-- 5 empty slots -->
+                <div class="leyline-slot" data-index="0"></div>
+                <div class="leyline-slot" data-index="1"></div>
+                <div class="leyline-slot" data-index="2"></div>
+                <div class="leyline-slot" data-index="3"></div>
+                <div class="leyline-slot" data-index="4"></div>
+            </div>
+        </section>
+
+        <!-- BOTTOM: Player Area -->
+        <footer id="player-area">
+            <div class="backpack-section">
+                <h2>Backpack</h2>
+                <div class="card-container" id="backpack-container">
+                    <!-- Owned cards go here -->
+                </div>
+            </div>
+            <div class="shop-section">
+                <h2>Shop <button id="btn-reroll-shop" class="secondary-btn">Reroll (5g)</button></h2>
+                <div class="card-container" id="shop-container">
+                    <!-- Cards to buy go here -->
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/cards.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

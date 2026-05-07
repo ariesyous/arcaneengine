@@ -1,0 +1,412 @@
+:root {
+    --bg-dark: #0f0c1b;
+    --bg-panel: rgba(25, 20, 40, 0.7);
+    --border-ornate: #d4af37;
+    --text-main: #f5f0e6;
+    --text-dim: #a8a0b0;
+    
+    --card-bg: #1c1829;
+    --card-border: #8a7040;
+    --card-highlight: #ffdf73;
+    
+    --sword-color: #ff4d4d;
+    --wand-color: #a855f7;
+    --cup-color: #3b82f6;
+    --pentacle-color: #fbbf24;
+    
+    --boss-color: #e11d48;
+    --shield-color: #60a5fa;
+
+    /* Dynamic sizing */
+    --card-h: clamp(100px, 16vh, 170px);
+    --card-w: calc(var(--card-h) * 0.65);
+    
+    --leyline-h: clamp(120px, 19vh, 200px);
+    --leyline-w: calc(var(--leyline-h) * 0.65);
+    
+    --boss-h: clamp(150px, 22vh, 250px);
+    --boss-w: calc(var(--boss-h) * 0.6);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Georgia', serif;
+    background: radial-gradient(circle at 50% 0%, #2a1b38 0%, var(--bg-dark) 80%);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    width: 100%;
+    max-width: 1600px;
+    height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+    padding: 1vh 2vw;
+}
+
+/* Glassmorphism Panels */
+header, section, footer {
+    background: var(--bg-panel);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    padding: 1vh 1vw;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* TOP: Boss Area */
+#target-area {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border-top: 3px solid var(--boss-color);
+}
+
+.boss-card {
+    text-align: center;
+}
+
+.boss-image-placeholder {
+    width: var(--boss-w);
+    height: var(--boss-h);
+    margin: 0 auto 0.5vh auto;
+    border: 2px solid var(--border-ornate);
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+.boss-name {
+    font-size: clamp(1.2rem, 3vh, 2rem);
+    font-weight: bold;
+    color: var(--border-ornate);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.boss-stats {
+    display: flex;
+    gap: 2rem;
+    font-size: clamp(0.9rem, 1.8vh, 1.2rem);
+    margin-bottom: 1rem;
+}
+
+.boss-hp { color: var(--sword-color); }
+.doom-clock { color: #facc15; font-weight: bold; }
+.boss-intent {
+    margin-top: 0.5rem;
+    font-size: clamp(0.8rem, 1.5vh, 1.1rem);
+    color: var(--text-dim);
+}
+
+/* MIDDLE: Leyline */
+#leyline-area {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+}
+
+.engine-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 2rem;
+}
+
+.player-stats {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+.player-stats .hp { color: var(--sword-color); }
+.player-stats .shields { color: var(--shield-color); }
+.player-stats .gold { color: var(--pentacle-color); }
+
+.leyline-slots {
+    display: flex;
+    gap: 1vw;
+    padding: 1vh;
+    position: relative;
+}
+
+.leyline-slots::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,0.5), transparent);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.leyline-slot {
+    width: var(--leyline-w);
+    height: var(--leyline-h);
+    border: 2px dashed rgba(212, 175, 55, 0.4);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    transition: all 0.3s ease;
+    background: rgba(0,0,0,0.3);
+}
+
+.leyline-slot.drag-over {
+    border-color: var(--card-highlight);
+    background: rgba(255, 223, 115, 0.1);
+    transform: scale(1.05);
+}
+
+/* BOTTOM: Player Area */
+#player-area {
+    flex: 0 1 30vh;
+    min-height: 0;
+    display: flex;
+    gap: 1vw;
+}
+
+.backpack-section, .shop-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.shop-section {
+    flex: 0 0 35vw;
+    border-left: 1px solid rgba(212, 175, 55, 0.2);
+    padding-left: 1rem;
+}
+
+h2 {
+    font-size: 1.2rem;
+    color: var(--border-ornate);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    align-content: flex-start;
+    flex: 1;
+}
+
+/* Cards */
+.card {
+    width: var(--card-w);
+    height: var(--card-h);
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 6px;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.card-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.4;
+    z-index: 1;
+    transition: opacity 0.2s;
+    border-radius: 4px;
+}
+
+.card:hover .card-bg {
+    opacity: 0.6;
+}
+
+.card-overlay {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.9) 100%);
+    border-radius: 4px;
+}
+
+.card:active {
+    cursor: grabbing;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(212, 175, 55, 0.2);
+}
+
+.leyline-slot .card {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: clamp(0.7rem, 1.5vh, 0.9rem);
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.card-suit { font-size: clamp(0.9rem, 1.8vh, 1.2rem); text-shadow: none; }
+.card-value { font-size: clamp(0.8rem, 1.6vh, 1.1rem); }
+
+.card-body {
+    text-align: center;
+    font-size: clamp(0.6rem, 1.2vh, 0.8rem);
+    color: #fff;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 3px #000;
+    font-weight: bold;
+}
+
+.card-cost {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--pentacle-color);
+    color: black;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border: 1px solid #000;
+    z-index: 3;
+}
+
+/* Suit colors */
+.suit-Swords { color: var(--sword-color); border-color: rgba(255, 77, 77, 0.5); }
+.suit-Wands { color: var(--wand-color); border-color: rgba(168, 85, 247, 0.5); }
+.suit-Cups { color: var(--cup-color); border-color: rgba(59, 130, 246, 0.5); }
+.suit-Pentacles { color: var(--pentacle-color); border-color: rgba(251, 191, 36, 0.5); }
+
+/* Court Modifiers */
+.court-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-color: var(--border-ornate);
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.primary-btn {
+    background: linear-gradient(to bottom, #d4af37, #b8860b);
+    color: #000;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.primary-btn:hover {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.8);
+    transform: scale(1.05);
+}
+
+.primary-btn:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.secondary-btn {
+    background: transparent;
+    border: 1px solid var(--border-ornate);
+    color: var(--border-ornate);
+    padding: 0.5rem 1rem;
+}
+
+.secondary-btn:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* Animations */
+@keyframes executePulse {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); transform: scale(1.05); }
+    70% { box-shadow: 0 0 0 20px rgba(212, 175, 55, 0); transform: scale(1); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); transform: scale(1); }
+}
+
+.executing-slot {
+    animation: executePulse 0.8s ease-out;
+    border-color: var(--card-highlight);
+}
+
+/* Popups for damage/shields */
+.popup-text {
+    position: absolute;
+    font-weight: bold;
+    font-size: 1.5rem;
+    pointer-events: none;
+    animation: floatUp 1s ease-out forwards;
+    z-index: 100;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+@keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(0.8); }
+    20% { transform: translateY(-10px) scale(1.2); }
+    100% { opacity: 0; transform: translateY(-40px) scale(1); }
+}
+
+.dmg-text { color: var(--sword-color); }
+.shield-text { color: var(--shield-color); }
+.gold-text { color: var(--pentacle-color); }
+.status-text { color: var(--wand-color); }
