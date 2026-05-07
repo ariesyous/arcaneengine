@@ -8,14 +8,72 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="game-container">
+    <!-- Main Menu Overlay -->
+    <div id="main-menu" class="fullscreen-overlay">
+        <div class="menu-content">
+            <h1>Arcane Engine</h1>
+            <p>A Tarot Auto-Battler</p>
+            <div class="menu-buttons">
+                <button id="btn-new-game" class="primary-btn menu-btn">New Game</button>
+                <button id="btn-how-to-play" class="secondary-btn menu-btn">How to Play</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Play Modal -->
+    <div id="how-to-play-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>How to Play</h2>
+            <div class="rules-text">
+                <h3>The Basics</h3>
+                <p>Buy cards from the shop and place up to 5 into the <strong>Leyline</strong>. Click <strong>Run Engine</strong> to execute them from left to right.</p>
+                <h3>Suits (Minor Arcana)</h3>
+                <ul>
+                    <li>⚔️ <strong>Swords:</strong> Deal flat damage to the Boss.</li>
+                    <li>🪄 <strong>Wands:</strong> Apply Poison (damage over time) to the Boss.</li>
+                    <li>🍷 <strong>Cups:</strong> Gain temporary Shields to absorb Boss attacks.</li>
+                    <li>🪙 <strong>Pentacles:</strong> Gain Gold to buy better cards.</li>
+                </ul>
+                <h3>Court Cards (Modifiers)</h3>
+                <ul>
+                    <li><strong>Page:</strong> Echoes (duplicates) the effect of the previous card.</li>
+                    <li><strong>Knight:</strong> Cleaves: Doubles the damage of the next combat card.</li>
+                    <li><strong>Queen:</strong> Converts all Shields into a massive damage burst.</li>
+                    <li><strong>King:</strong> Loops the engine for a second pass (once per turn).</li>
+                </ul>
+                <h3>Mechanics</h3>
+                <p><strong>Cup Overflow:</strong> Every 5 excess shields at the end of a turn heals you for 1 HP.</p>
+                <p><strong>Doom Clock:</strong> Defeat the Boss before the clock reaches zero!</p>
+                <p><strong>Selling Cards:</strong> Drag garbage cards to the Sell Zone to gain 2 Gold.</p>
+            </div>
+            <button id="btn-close-modal" class="primary-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- End Game Modal -->
+    <div id="end-game-modal" class="modal hidden">
+        <div class="modal-content" style="text-align: center;">
+            <h2 id="end-game-title">Game Over</h2>
+            <p id="end-game-message" style="font-size: 1.2rem; margin-bottom: 2rem;">The Arcane Engine has shattered.</p>
+            <button id="btn-play-again" class="primary-btn">Play Again</button>
+        </div>
+    </div>
+
+    <div id="game-container" class="hidden">
         <!-- TOP: The Target -->
         <header id="target-area">
             <div class="boss-card">
                 <div class="boss-name" id="boss-name">The Hierophant</div>
                 <div class="boss-stats">
-                    <div class="boss-hp">HP: <span id="boss-hp-val">100</span>/<span id="boss-hp-max">100</span></div>
+                    <div class="boss-hp">
+                        <div class="health-bar-container">
+                            <div class="health-bar-bg"></div>
+                            <div class="health-bar-fill boss-hp-fill" id="boss-hp-fill" style="width: 100%;"></div>
+                            <div class="health-bar-text">HP: <span id="boss-hp-val">100</span>/<span id="boss-hp-max">100</span></div>
+                        </div>
+                    </div>
                     <div class="doom-clock">Doom Clock: <span id="doom-clock-val">10</span></div>
+                    <div class="boss-poison hidden" id="boss-poison-badge">🪄 Poison: <span id="boss-poison-val">0</span></div>
                 </div>
                 <div class="boss-image-placeholder"></div>
             </div>
@@ -27,9 +85,19 @@
         <!-- MIDDLE: The Leyline -->
         <section id="leyline-area">
             <div class="engine-controls">
+                <div class="utility-buttons">
+                    <button id="btn-help" class="utility-btn">?</button>
+                    <button id="btn-toggle-sound" class="utility-btn">Sound: ON</button>
+                </div>
                 <button id="btn-run-engine" class="primary-btn">Run Engine</button>
                 <div class="player-stats">
-                    <div class="stat hp">HP: <span id="player-hp-val">50</span></div>
+                    <div class="stat hp">
+                        <div class="health-bar-container small-bar">
+                            <div class="health-bar-bg"></div>
+                            <div class="health-bar-fill player-hp-fill" id="player-hp-fill" style="width: 100%;"></div>
+                            <div class="health-bar-text">HP: <span id="player-hp-val">50</span></div>
+                        </div>
+                    </div>
                     <div class="stat shields">Shields: <span id="player-shields-val">0</span></div>
                     <div class="stat gold">Gold: <span id="player-gold-val">25</span></div>
                 </div>
@@ -47,7 +115,12 @@
         <!-- BOTTOM: Player Area -->
         <footer id="player-area">
             <div class="backpack-section">
-                <h2>Backpack</h2>
+                <div class="backpack-header">
+                    <h2>Backpack</h2>
+                    <div id="sell-zone" class="sell-zone">
+                        <span>Sell Zone (+2g)</span>
+                    </div>
+                </div>
                 <div class="card-container" id="backpack-container">
                     <!-- Owned cards go here -->
                 </div>
@@ -62,6 +135,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="js/audio.js"></script>
     <script src="js/cards.js"></script>
     <script src="js/engine.js"></script>
     <script src="js/ui.js"></script>

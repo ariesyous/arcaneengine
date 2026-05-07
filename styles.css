@@ -410,3 +410,241 @@ button {
 .shield-text { color: var(--shield-color); }
 .gold-text { color: var(--pentacle-color); }
 .status-text { color: var(--wand-color); }
+
+/* --- NEW UI ELEMENTS --- */
+
+/* Hidden Utility */
+.hidden {
+    display: none !important;
+}
+
+/* Main Menu Overlay */
+.fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #2a1b38 0%, var(--bg-dark) 100%);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-content {
+    text-align: center;
+    background: var(--bg-panel);
+    padding: 3rem 5rem;
+    border: 2px solid var(--border-ornate);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.menu-content h1 {
+    font-size: 4rem;
+    color: var(--border-ornate);
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+}
+
+.menu-content p {
+    font-size: 1.5rem;
+    color: var(--text-dim);
+    margin-bottom: 3rem;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.menu-btn {
+    font-size: 1.5rem;
+    padding: 1rem;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: var(--bg-panel);
+    border: 2px solid var(--border-ornate);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    color: var(--text-main);
+}
+
+.modal-content h2 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-ornate);
+    padding-bottom: 0.5rem;
+}
+
+.rules-text h3 {
+    color: var(--card-highlight);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.rules-text ul {
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.rules-text li {
+    margin-bottom: 0.5rem;
+}
+
+.rules-text p {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+#btn-close-modal {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+/* Health Bars */
+.health-bar-container {
+    position: relative;
+    width: 300px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #555;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.health-bar-container.small-bar {
+    width: 200px;
+    height: 20px;
+}
+
+.health-bar-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 0, 0, 0.2);
+}
+
+.health-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    transition: width 0.3s ease-out, background-color 0.3s;
+}
+
+.boss-hp-fill {
+    background: linear-gradient(90deg, #8b0000, #ff4d4d);
+}
+
+.player-hp-fill {
+    background: linear-gradient(90deg, #006400, #4ade80);
+}
+
+.health-bar-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    z-index: 2;
+}
+
+/* Sell Zone */
+.backpack-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.backpack-header h2 {
+    margin-bottom: 0;
+}
+
+.sell-zone {
+    border: 2px dashed var(--pentacle-color);
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--pentacle-color);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sell-zone.drag-over {
+    background: rgba(251, 191, 36, 0.3);
+    transform: scale(1.05);
+}
+
+/* Utility Buttons */
+.utility-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.utility-btn {
+    background: transparent;
+    border: 1px solid var(--text-dim);
+    color: var(--text-dim);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.utility-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    border-color: var(--text-main);
+}
+
+/* Poison Badge */
+.boss-poison {
+    color: var(--wand-color);
+    font-weight: bold;
+    animation: pulsePoison 2s infinite;
+}
+
+@keyframes pulsePoison {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 10px var(--wand-color); }
+    100% { transform: scale(1); opacity: 0.8; }
+}

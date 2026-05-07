@@ -4,17 +4,42 @@ function updateStatsUI() {
     document.getElementById('boss-name').textContent = STATE.boss.name;
     document.getElementById('boss-hp-val').textContent = STATE.boss.hp;
     document.getElementById('boss-hp-max').textContent = STATE.boss.maxHp;
-    document.getElementById('boss-attack-val').textContent = STATE.boss.attack;
+    
+    const intent = STATE.boss.intents[STATE.boss.intentIndex];
+    let intentText = '';
+    if (intent) {
+        if (intent.type === 'attack') intentText = `Attack: ${intent.val} DMG`;
+        else if (intent.type === 'shield') intentText = `Defend: ${intent.val} Shields`;
+    }
+    const bossIntentEl = document.getElementById('boss-intent');
+    if (bossIntentEl) bossIntentEl.textContent = `Next Intent: ${intentText}`;
+
     document.getElementById('doom-clock-val').textContent = STATE.boss.doomClock;
     
     document.getElementById('player-hp-val').textContent = STATE.player.hp;
     document.getElementById('player-shields-val').textContent = STATE.player.shields;
     document.getElementById('player-gold-val').textContent = STATE.player.gold;
     
-    // Update Boss HP visual color if low
-    const hpPercent = STATE.boss.hp / STATE.boss.maxHp;
-    const hpEl = document.getElementById('boss-hp-val');
-    hpEl.style.color = hpPercent < 0.3 ? '#ff0000' : 'var(--sword-color)';
+    // Update Health Bars
+    const bossHpPercent = Math.max(0, STATE.boss.hp / STATE.boss.maxHp) * 100;
+    const bossHpFill = document.getElementById('boss-hp-fill');
+    if (bossHpFill) bossHpFill.style.width = `${bossHpPercent}%`;
+    
+    const playerHpPercent = Math.max(0, STATE.player.hp / STATE.player.maxHp) * 100;
+    const playerHpFill = document.getElementById('player-hp-fill');
+    if (playerHpFill) playerHpFill.style.width = `${playerHpPercent}%`;
+
+    // Update Poison Badge
+    const bossPoisonBadge = document.getElementById('boss-poison-badge');
+    const bossPoisonVal = document.getElementById('boss-poison-val');
+    if (bossPoisonBadge && bossPoisonVal) {
+        if (STATE.boss.poison > 0) {
+            bossPoisonBadge.classList.remove('hidden');
+            bossPoisonVal.textContent = STATE.boss.poison;
+        } else {
+            bossPoisonBadge.classList.add('hidden');
+        }
+    }
 }
 
 function updateUIControls() {
@@ -97,6 +122,9 @@ function handleDragEnd(e) {
     draggedFrom = null;
     draggedSlotIndex = null;
     document.querySelectorAll('.leyline-slot').forEach(s => s.classList.remove('drag-over'));
+    const sellZone = document.getElementById('sell-zone');
+    if (sellZone) sellZone.classList.remove('drag-over');
+    if (window.Audio) Audio.playDrop();
 }
 
 function handleDragOver(e) {
@@ -117,6 +145,46 @@ function handleDragLeave(e) {
     if (e.currentTarget.classList.contains('leyline-slot')) {
         e.currentTarget.classList.remove('drag-over');
     }
+}
+
+// Sell Zone Handlers
+function handleDragOverSell(e) {
+    if (STATE.phase !== 'SETUP') return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnterSell(e) {
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeaveSell(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+
+function handleDropSell(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (!draggedCardId) return;
+
+    const { card } = getCardObjById(draggedCardId);
+    if (!card) return;
+
+    // Only sell from backpack or leyline (not shop)
+    if (draggedFrom === 'shop') return;
+
+    if (draggedFrom === 'backpack') {
+        STATE.ownedCards = STATE.ownedCards.filter(c => c.id !== card.id);
+    } else if (draggedFrom === 'leyline') {
+        STATE.leyline[draggedSlotIndex] = null;
+    }
+    
+    // Add gold
+    STATE.player.gold += 2; // Flat 2g rate
+    if (window.Audio) Audio.playGold();
+    showPopupElement(e.currentTarget, '+2g', 'gold-text');
+    
+    renderAll();
 }
 
 function getCardObjById(id) {
@@ -256,10 +324,25 @@ function attachDragListeners() {
     });
 
     const backpack = document.getElementById('backpack-container');
-    backpack.removeEventListener('dragover', handleDragOver);
-    backpack.removeEventListener('drop', handleDropBackpack);
-    backpack.addEventListener('dragover', handleDragOver);
-    backpack.addEventListener('drop', handleDropBackpack);
+    if (backpack) {
+        backpack.removeEventListener('dragover', handleDragOver);
+        backpack.removeEventListener('drop', handleDropBackpack);
+        backpack.addEventListener('dragover', handleDragOver);
+        backpack.addEventListener('drop', handleDropBackpack);
+    }
+    
+    const sellZone = document.getElementById('sell-zone');
+    if (sellZone) {
+        sellZone.removeEventListener('dragover', handleDragOverSell);
+        sellZone.removeEventListener('dragenter', handleDragEnterSell);
+        sellZone.removeEventListener('dragleave', handleDragLeaveSell);
+        sellZone.removeEventListener('drop', handleDropSell);
+
+        sellZone.addEventListener('dragover', handleDragOverSell);
+        sellZone.addEventListener('dragenter', handleDragEnterSell);
+        sellZone.addEventListener('dragleave', handleDragLeaveSell);
+        sellZone.addEventListener('drop', handleDropSell);
+    }
 }
 
 function refreshShop() {
@@ -276,6 +359,34 @@ document.getElementById('btn-run-engine').addEventListener('click', runEngine);
 document.getElementById('btn-reroll-shop').addEventListener('click', () => {
     if (STATE.phase === 'SETUP' && STATE.player.gold >= 5) {
         STATE.player.gold -= 5;
+        if (window.Audio) Audio.playGold();
         refreshShop();
+    } else {
+        if (window.Audio) Audio.playError();
     }
 });
+
+const btnToggleSound = document.getElementById('btn-toggle-sound');
+if (btnToggleSound) {
+    btnToggleSound.addEventListener('click', () => {
+        if (window.toggleSound) window.toggleSound();
+    });
+}
+
+window.showEndGameModal = function(title, message) {
+    const modal = document.getElementById('end-game-modal');
+    const titleEl = document.getElementById('end-game-title');
+    const messageEl = document.getElementById('end-game-message');
+    const btnPlayAgain = document.getElementById('btn-play-again');
+    
+    if (modal && titleEl && messageEl && btnPlayAgain) {
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        modal.classList.remove('hidden');
+        
+        btnPlayAgain.onclick = () => location.reload();
+    } else {
+        alert(message);
+        location.reload();
+    }
+};
